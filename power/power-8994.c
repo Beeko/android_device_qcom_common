@@ -82,7 +82,9 @@ static void set_power_profile(int profile) {
     } else if (profile == PROFILE_HIGH_PERFORMANCE) {
         int resource_values[] = { CPUS_ONLINE_MAX, 0x0901,
             CPU0_MIN_FREQ_TURBO_MAX, CPU1_MIN_FREQ_TURBO_MAX,
-            CPU2_MIN_FREQ_TURBO_MAX, CPU3_MIN_FREQ_TURBO_MAX };
+            CPU2_MIN_FREQ_TURBO_MAX, CPU3_MIN_FREQ_TURBO_MAX,
+            CPU4_MIN_FREQ_TURBO_MAX, CPU5_MIN_FREQ_TURBO_MAX,
+            CPU6_MIN_FREQ_TURBO_MAX, CPU7_MIN_FREQ_TURBO_MAX };
         perform_hint_action(DEFAULT_PROFILE_HINT_ID,
             resource_values, sizeof(resource_values)/sizeof(resource_values[0]));
         ALOGD("%s: set performance mode", __func__);
@@ -182,9 +184,18 @@ int power_hint_override(__attribute__((unused)) struct power_module *module,
         return HINT_HANDLED;
     }
 
+    if (hint == POWER_HINT_LAUNCH_BOOST) {
+        int duration = 2000;
+        int resources[] = { SCHED_BOOST_ON, 0x20D };
+
+        interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
+
+        return HINT_HANDLED;
+    }
+
     if (hint == POWER_HINT_CPU_BOOST) {
         int duration = (hintdata)data / 1000;
-        int resources[] = { CPUS_ONLINE_MIN_2, SCHED_BOOST_ON, 0x20B, 0x30B };
+        int resources[] = { SCHED_BOOST_ON };
 
         if (duration > 0)
             interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
